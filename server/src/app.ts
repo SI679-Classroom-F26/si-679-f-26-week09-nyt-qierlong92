@@ -1,3 +1,4 @@
+import path from 'node:path';
 import express from 'express';
 import cors from 'cors';
 import { productsRouter } from './routes/products-router.js';
@@ -9,6 +10,11 @@ import { getClientOrigin } from './config.js';
 
 const app = express();
 
+// Is the app up?
+app.get('/health', (_req, res) => {
+  res.json({ ok: true });
+});
+
 app.use(cors({ origin: getClientOrigin() }));
 app.use(express.json());
 app.use('/products', productsRouter);
@@ -16,5 +22,9 @@ app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/orders', ordersRouter);
 app.use(errorHandler);
+
+// The built client: index.html and its JavaScript and CSS.
+const clientDist = path.join(import.meta.dirname, '..', '..', 'client', 'dist');
+app.use(express.static(clientDist));
 
 export { app };
